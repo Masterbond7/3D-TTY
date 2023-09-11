@@ -9,15 +9,16 @@ int main() {
     noecho(); // Stops user input appearing
     keypad(stdscr, TRUE); // Enable FN & arrow keys etc
 
-    printw("Type any charachter to see it in bold: ");
+    // Get terminal resolution
+    int w_height, w_width;
+    getmaxyx(stdscr, w_height, w_width);
+
+    // Print terminal size
+    mvprintw(0, 0, "#"); mvprintw(w_height-1, w_width-1, "#");
+    mvprintw(1, 1, "Resolution is %dx%d", w_width, w_height);
     refresh();
 
-    attron(A_BOLD);
-    printw("%c\n", getch());
-    attroff(A_BOLD);
-
-    printw("Hello World!");
-    refresh();
+    // End program on user input
     getch();
     endwin();
 
