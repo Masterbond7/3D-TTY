@@ -29,15 +29,28 @@ int main() {
         // Print terminal size
         mvprintw(1, 1, "The overall resolution is %dx%d", w_width, w_height);
 
-        // Moving box
+        // Draw box
         if (x+9==w_width-1) {dir=-1;}
         if (x==1) {dir=1;}
         draw_box(stdscr, x, 5, 9, 3);
         mvprintw(6,x+1,"Box! c:");
-        x+=dir;
 
         // Display update
         refresh();
+
+        // Clean up the box
+        if (dir == 1) {
+            mvaddch(5,x,' ');
+            mvaddch(6,x,' ');
+            mvaddch(7,x,' ');
+        } else {
+            mvaddch(5,x+9,' ');
+            mvaddch(6,x+9,' ');
+            mvaddch(7,x+9,' ');
+        }
+
+        // Move the box
+        x+=dir;
 
         // Delay
         usleep(1000000/30); // 30fps
