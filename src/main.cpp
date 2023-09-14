@@ -17,9 +17,9 @@ int main() {
     int w_height, w_width;
     getmaxyx(stdscr, w_height, w_width);
 
-    // Make box and make it go
-    int dir = 1;
-    int x = 1;
+    // Init variables
+    float c_angle = 0.0f;
+    float c_fov = 90.0f;
 
     // Graphics loop
     while (true) {
@@ -29,28 +29,21 @@ int main() {
         // Print terminal size
         mvprintw(1, 1, "The overall resolution is %dx%d", w_width, w_height);
 
-        // Draw box
-        if (x+9==w_width-1) {dir=-1;}
-        if (x==1) {dir=1;}
-        draw_box(stdscr, x, 5, 9, 3);
-        mvprintw(6,x+1,"Box! c:");
+        // Go through each column of the screen
+        for (int x=0; x<w_width; x++) {
+            float angle = ((c_fov/-2.0f)+c_angle + (c_fov/w_width) * x);
+            
+            char buffer[3]={0};
+            sprintf(buffer, "%d", (int)angle);
+
+            for (int y=0; y<w_height; y++) {mvprintw(y,x,buffer);}
+
+            refresh();
+            usleep(1000000/2);
+        }
 
         // Display update
         refresh();
-
-        // Clean up the box
-        if (dir == 1) {
-            mvaddch(5,x,' ');
-            mvaddch(6,x,' ');
-            mvaddch(7,x,' ');
-        } else {
-            mvaddch(5,x+9,' ');
-            mvaddch(6,x+9,' ');
-            mvaddch(7,x+9,' ');
-        }
-
-        // Move the box
-        x+=dir;
 
         // Delay
         usleep(1000000/30); // 30fps
