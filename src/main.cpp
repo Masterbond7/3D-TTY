@@ -24,9 +24,9 @@ int main() {
 
     // Triangle
     double triangle[3][3] = {
-    {0.25, 0.25, 0.0},
-    {0.0, 1.0, 0.0},
-    {0.0, 0.0, 1.0}};
+    {0.0, 0.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {0.0, 1.0, 0.0}};
 
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
