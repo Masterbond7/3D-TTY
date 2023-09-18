@@ -10,7 +10,7 @@
         dest[2]=v1[2]-v2[2];
 
 // NOTE: NO BACKFACE CULLING
-int intersects_triangle(double orig[3], double dest[3],
+double intersects_triangle(double orig[3], double dest[3],
                         double vert0[3], double vert1[3], double vert2[3]) {
     // Create variables
     double edge1[3], edge2[3], tvec[3], pvec[3], qvec[3];
@@ -28,8 +28,7 @@ int intersects_triangle(double orig[3], double dest[3],
     det = DOT(edge1, pvec);
 
     // If ~0 then ray is paralell to the triangle (no hit)
-    if (det > -EPSILON && det < EPSILON) {return 0;}
-    //if (det<EPSILON) {return 0;}
+    if (det > -EPSILON && det < EPSILON) {return -1;}
 
     // Calculate inv_det
     inv_det = 1.0/det;
@@ -39,21 +38,22 @@ int intersects_triangle(double orig[3], double dest[3],
 
     // Calculate U and test if inside triangle
     u = DOT(tvec, pvec) * inv_det;
-    if (u < 0.0 || u > 1.0) {return 0;}
+    if (u < 0.0 || u > 1.0) {return -1;}
 
     // Calculate Q
     CROSS(qvec, tvec, edge1);
 
     // Calculate V and test if instide triangle
     v = DOT(dest, qvec) * inv_det;
-    if (v < 0.0 || u+v > 1.0) {return 0;}
+    if (v < 0.0 || u+v > 1.0) {return -1;}
 
     // Calculate T (distance to triangle plane?)
     t = DOT(edge2, qvec);
 
     // check if cam is infront of and looking at normal or behind and looking at inverse normal
-    if (t*det < EPSILON) {return 0;}
+    if (t*det < EPSILON) {return -1;}
 
     // If the ray didn't not hit the triangle then it hit
-    return 1;
+    if (t < 0) {t *= -1;}
+    return t;
 }

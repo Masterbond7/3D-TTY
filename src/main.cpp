@@ -22,6 +22,9 @@ int main() {
     int w_height, w_width;
     getmaxyx(stdscr, w_height, w_width);
 
+    // Make z_buffer
+    double zbuf[w_width][w_height];
+
     // Triangle
     double triangle[4][3] = { // v0, v1, v2, normal
     { 0.0, -1.0, -1.0},
@@ -48,6 +51,13 @@ int main() {
 
     // Graphics loop
     while (true) {
+        // Reset z_buffer
+        for (int i=0; i<w_width; i++) {
+            for (int j=0; j<w_height; j++) {
+                zbuf[i][j] = 0;
+            }
+        }
+
         // Get input
         char c = ' ';
         c = getch();
@@ -108,7 +118,7 @@ int main() {
 
                 //dest[0]=0;dest[1]=-1;dest[2]=0;
 
-                // Check for intersection, if = #, else = -
+                // Determine colour for lighting
                 char state;
                 int shade;
                 lighting_dot = dest[0]*new_tri[3][0]*-1 +  dest[1]*new_tri[3][1]*-1 + dest[2]*new_tri[3][2]*-1;
@@ -116,11 +126,12 @@ int main() {
                 if (lighting_dot >  1) {lighting_dot =  1;}
                 lighting_dangle = 1.0 - (acos(lighting_dot)*(2.0/M_PI));
                 if (lighting_dangle < 0) {lighting_dangle *= -1;}
-                //if (lighting_dangle > M_PI /) {lighting_dangle = ((int)lighting_dangle) % 7;}
-                //shade = (int)round(lighting_dangle*shades);
                 shade = shades - (int)round(lighting_dangle*shades);
                 if (shade > shades-1) {shade = shades-1;}
-                if (intersects_triangle(c_pos, dest, new_tri[0], new_tri[1], new_tri[2]) == 1) {state=gradient[shade];}//sprintf(state,"#");}//state[0]=gradient[7-((int)(lighting_dangle*7)-1)]; state[1]='\0';}
+
+                // Check for intersection with triangle
+                int is_intersection = intersects_triangle(c_pos, dest, new_tri[0], new_tri[1], new_tri[2]);
+                if ((is_intersection != -1) && (zbuf[x][y] == 0 || is_intersection < zbuf[x][y])) {state=gradient[shade]; zbuf[x][y]=is_intersection;}
                 else {state=' ';}
                 mvaddch(y,x,state);
 
