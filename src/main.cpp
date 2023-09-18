@@ -6,6 +6,7 @@
 #include <cmath>
 
 double temp=0.0;
+double rot=0;
 
 // Main function
 int main() {
@@ -28,6 +29,8 @@ int main() {
     { 0.0,  1.0, -1.0},
     {-1.0,  0.0,  0.0}};
 
+    double new_tri[4][3];
+
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
     double c_fov = 90.0f; // degrees
@@ -40,6 +43,8 @@ int main() {
     const char gradient[] = {'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'x', 'd', 'o', 'l', 'c', ':', ';', ',', '\'', '.'};
     int shades = 18;
     //const char gradient[7] = {'\'', '-', '!', '+', '=', '&', '#'};
+    //const char gradient[1] = {'#'};
+    //int shades = 1;
 
     // Graphics loop
     while (true) {
@@ -58,6 +63,16 @@ int main() {
         if (c=='i') {c_angle[0]-=2.5;}
         if (c=='l') {c_angle[1]+=10.0;}
         if (c=='j') {c_angle[1]-=10.0;}
+
+        if (c=='q') {rot-=0.1;}
+        if (c=='e') {rot+=0.1;}
+
+        // Rotate triangle v_rz
+        double tx, ty, tz;
+        v_rz(triangle[0], rot, &tx, &ty, &tz); new_tri[0][0]=tx; new_tri[0][1]=ty; new_tri[0][2]=tz;
+        v_rz(triangle[1], rot, &tx, &ty, &tz); new_tri[1][0]=tx; new_tri[1][1]=ty; new_tri[1][2]=tz;
+        v_rz(triangle[2], rot, &tx, &ty, &tz); new_tri[2][0]=tx; new_tri[2][1]=ty; new_tri[2][2]=tz;
+        v_rz(triangle[3], rot, &tx, &ty, &tz); new_tri[3][0]=tx; new_tri[3][1]=ty; new_tri[3][2]=tz;
 
         if (c_angle[1] < -180) {c_angle[1] = 360 + c_angle[1];}
         if (c_angle[1] >  180) {c_angle[1] =-360 + c_angle[1];}
@@ -96,7 +111,7 @@ int main() {
                 // Check for intersection, if = #, else = -
                 char state;
                 int shade;
-                lighting_dot = dest[0]*triangle[3][0]*-1 +  dest[1]*triangle[3][1]*-1 + dest[2]*triangle[3][2]*-1;
+                lighting_dot = dest[0]*new_tri[3][0]*-1 +  dest[1]*new_tri[3][1]*-1 + dest[2]*new_tri[3][2]*-1;
                 if (lighting_dot < -1) {lighting_dot = -1;}
                 if (lighting_dot >  1) {lighting_dot =  1;}
                 lighting_dangle = 1.0 - (acos(lighting_dot)*(2.0/M_PI));
@@ -105,12 +120,12 @@ int main() {
                 //shade = (int)round(lighting_dangle*shades);
                 shade = shades - (int)round(lighting_dangle*shades);
                 if (shade > shades-1) {shade = shades-1;}
-                if (intersects_triangle(c_pos, dest, triangle[0], triangle[1], triangle[2]) == 1) {state=gradient[shade];}//sprintf(state,"#");}//state[0]=gradient[7-((int)(lighting_dangle*7)-1)]; state[1]='\0';}
+                if (intersects_triangle(c_pos, dest, new_tri[0], new_tri[1], new_tri[2]) == 1) {state=gradient[shade];}//sprintf(state,"#");}//state[0]=gradient[7-((int)(lighting_dangle*7)-1)]; state[1]='\0';}
                 else {state=' ';}
                 mvaddch(y,x,state);
 
                 // Debug
-                temp = shade;
+                temp = rot;
                 char debug[256];
                 sprintf(debug, "TMP:%f, Ox:%f, Oy:%f, Oz:%f, Ex:%f, Ey:%f, Ez:%f, Ah:%f, Av:%f",temp, c_pos[0], c_pos[1], c_pos[2], dest[0], dest[1], dest[2], c_angle[1], c_angle[0]);
                 mvprintw(0,0,debug);
