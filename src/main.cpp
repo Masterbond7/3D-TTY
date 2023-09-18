@@ -23,10 +23,10 @@ int main() {
 
     // Triangle
     double triangle[4][3] = { // v0, v1, v2, normal
-    {0.0, 0.0, 0.0},
-    {0.0, 0.0, 1.0},
-    {0.0, 1.0, 0.0},
-    {-1.0, 0.0, 0.0}};
+    { 0.0, -1.0, -1.0},
+    { 0.0,  0.0,  1.0},
+    { 0.0,  1.0, -1.0},
+    {-1.0,  0.0,  0.0}};
 
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
@@ -35,9 +35,11 @@ int main() {
     double c_rdist = 1.0f; // Render distance
 
     // Init gradient & lighting_delta (angle between camera and face normal
-    double lighting_delta[3] = {0, 0, 0};
+    double lighting_dot = 0;
     double lighting_dangle = 0.0;
-    const char gradient[7] = {'-', '^', '!', '%', '>', '$', '#'};
+    const char gradient[] = {'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'x', 'd', 'o', 'l', 'c', ':', ';', ',', '\'', '.'};
+    int shades = 18;
+    //const char gradient[7] = {'\'', '-', '!', '+', '=', '&', '#'};
 
     // Graphics loop
     while (true) {
@@ -56,6 +58,11 @@ int main() {
         if (c=='i') {c_angle[0]-=2.5;}
         if (c=='l') {c_angle[1]+=10.0;}
         if (c=='j') {c_angle[1]-=10.0;}
+
+        if (c_angle[1] < -180) {c_angle[1] = 360 + c_angle[1];}
+        if (c_angle[1] >  180) {c_angle[1] =-360 + c_angle[1];}
+        if (c_angle[0] <  -90) {c_angle[0] = -90;}
+        if (c_angle[0] >   90) {c_angle[0] =  90;}
 
         // Go through each column of the screen
         for (int x=0; x<w_width; x++) {
@@ -84,20 +91,26 @@ int main() {
                 v_rz(dest, h_angle, &dest_x, &dest_y, &dest_z); // Rotate dest left/right
                 dest[0]=dest_x;dest[1]=dest_y;dest[2]=dest_z; // Set new dest
 
+                //dest[0]=0;dest[1]=-1;dest[2]=0;
+
                 // Check for intersection, if = #, else = -
-                char state[2];
-                lighting_delta[0] = (triangle[3][0] + dest[0]) / 2; // x
-                lighting_delta[1] = (triangle[3][1] + dest[1]) / 2; // y
-                //lighting_delta[2] = (triangle[3][2] + dest[2]) / 2; // z
-                lighting_dangle = sqrt(pow(lighting_delta[0],2) + pow(lighting_delta[1],2)) / 1.0; // Adj/Hyp; Adj = sqrt(x^2 + y^2); Hyp = 1
+                char state;
+                int shade;
+                lighting_dot = dest[0]*triangle[3][0]*-1 +  dest[1]*triangle[3][1]*-1 + dest[2]*triangle[3][2]*-1;
+                if (lighting_dot < -1) {lighting_dot = -1;}
+                if (lighting_dot >  1) {lighting_dot =  1;}
+                lighting_dangle = 1.0 - (acos(lighting_dot)*(2.0/M_PI));
                 if (lighting_dangle < 0) {lighting_dangle *= -1;}
-                if (lighting_dangle > 9) {lighting_dangle = ((int)lighting_dangle) % 7;}
-                if (intersects_triangle(c_pos, dest, triangle[0], triangle[1], triangle[2]) == 1) {sprintf(state,"#");}//state[0]=gradient[7-((int)(lighting_dangle*7)-1)]; state[1]='\0';}
-                else {sprintf(state,"-");}
-                mvprintw(y,x,state);
+                //if (lighting_dangle > M_PI /) {lighting_dangle = ((int)lighting_dangle) % 7;}
+                //shade = (int)round(lighting_dangle*shades);
+                shade = shades - (int)round(lighting_dangle*shades);
+                if (shade > shades-1) {shade = shades-1;}
+                if (intersects_triangle(c_pos, dest, triangle[0], triangle[1], triangle[2]) == 1) {state=gradient[shade];}//sprintf(state,"#");}//state[0]=gradient[7-((int)(lighting_dangle*7)-1)]; state[1]='\0';}
+                else {state=' ';}
+                mvaddch(y,x,state);
 
                 // Debug
-                temp = lighting_dangle;
+                temp = shade;
                 char debug[256];
                 sprintf(debug, "TMP:%f, Ox:%f, Oy:%f, Oz:%f, Ex:%f, Ey:%f, Ez:%f, Ah:%f, Av:%f",temp, c_pos[0], c_pos[1], c_pos[2], dest[0], dest[1], dest[2], c_angle[1], c_angle[0]);
                 mvprintw(0,0,debug);
