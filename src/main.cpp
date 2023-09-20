@@ -88,10 +88,11 @@ int main() {
     // Init gradient & lighting_delta (angle between camera and face normal
     double lighting_dot = 0;
     double lighting_dangle = 0.0;
-    //const char gradient[] = {'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'x', 'd', 'o', 'l', 'c', ':', ';', ',', '\'', '.'};
-    //int shades = 18;
-    const char gradient[7] = {'#', '&', '=', '+', '!', '-', '\''};//{'\'', '-', '!', '+', '=', '&', '#'};
-    int shades = 7;
+    double l_ray[3] = {0.0, 0.0, 0.0};
+    const char gradient[] = {'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'x', 'd', 'o', 'l', 'c', ':', ';', ',', '\'', '.'};
+    int shades = 18;
+    //const char gradient[7] = {'#', '&', '=', '+', '!', '-', '\''};//{'\'', '-', '!', '+', '=', '&', '#'};
+    //int shades = 7;
     //const char gradient[1] = {'#'};
     //int shades = 1;
 
@@ -165,10 +166,18 @@ int main() {
 
                     //dest[0]=0;dest[1]=-1;dest[2]=0;
 
+                    // Determine light ray direction (ray now plane behind camera)
+                    double tx, ty, tz;
+                    l_ray[0] = c_rdist; l_ray[1]=0.0; l_ray[2]=0.0;
+                    v_ry(l_ray, (c_angle[0]*M_PI)/180.0, &tx, &ty, &tz);
+                    l_ray[0]=tx;l_ray[1]=ty;l_ray[2]=tz;
+                    v_rz(l_ray, (c_angle[1]*M_PI)/180.0, &tx, &ty, &tz);
+                    l_ray[0]=tx;l_ray[1]=ty;l_ray[2]=tz;
+
                     // Determine colour for lighting
                     char state = ' ';
                     int shade;
-                    lighting_dot = dest[0]*new_tri[3][0]*-1 +  dest[1]*new_tri[3][1]*-1 + dest[2]*new_tri[3][2]*-1;
+                    lighting_dot = l_ray[0]*new_tri[3][0]*-1 +  l_ray[1]*new_tri[3][1]*-1 + l_ray[2]*new_tri[3][2]*-1;
                     if (lighting_dot < -1) {lighting_dot = -1;}
                     if (lighting_dot >  1) {lighting_dot =  1;}
                     lighting_dangle = 1.0 - (acos(lighting_dot)*(2.0/M_PI));
@@ -185,15 +194,19 @@ int main() {
                    // mvaddch(y,x,state);
 
                     // Debug
-                    temp = rot;
-                    char debug[256];
-                    sprintf(debug, "TMP:%f, Ox:%f, Oy:%f, Oz:%f, Ex:%f, Ey:%f, Ez:%f, Ah:%f, Av:%f",temp, c_pos[0], c_pos[1], c_pos[2], dest[0], dest[1], dest[2], c_angle[1], c_angle[0]);
-                    mvprintw(0,0,debug);
+                    //temp = rot;
+                    //char debug[256];
+                    //sprintf(debug, "TMP:%f, Ox:%f, Oy:%f, Oz:%f, Lx:%f, Ly:%f, Lz:%f, Ah:%f, Av:%f",temp, c_pos[0], c_pos[1], c_pos[2], l_ray[0], l_ray[1], l_ray[2], c_angle[1], c_angle[0]);
+                    //mvprintw(0,0,debug);
 
                     // Delay
                     //usleep(1000000/10000);
                 }
             }
+            //char tri_n[16];
+            //sprintf(tri_n, "%d", t);
+            //mvprintw(0,0,tri_n);
+            //refresh();
         }
 
         // Display update
