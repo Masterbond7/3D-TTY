@@ -4,12 +4,15 @@
 #include "./vector_math.hpp"
 #include <unistd.h>
 #include <cmath>
+#include <fstream>
 
 double temp=0.0;
 double rot=0;
 
 // Main function
 int main() {
+    std::ofstream file;
+    //file.open("points.csv");
     // Initialize ncurses
     setlocale(LC_ALL, ""); // Needed for extended ASCII
     initscr(); // Init screen
@@ -89,8 +92,8 @@ int main() {
     double lighting_dot = 0;
     double lighting_dangle = 0.0;
     double l_ray[3] = {0.0, 0.0, 0.0};
-    const char gradient[] = {'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'x', 'd', 'o', 'l', 'c', ':', ';', ',', '\'', '.'};
-    int shades = 18;
+    const char gradient[] = {'#', 'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'd', 'x', 'o', 'l', 'c', ';', ':', ',', '\'', '.'};
+    int shades = 19;
     //const char gradient[7] = {'#', '&', '=', '+', '!', '-', '\''};//{'\'', '-', '!', '+', '=', '&', '#'};
     //int shades = 7;
     //const char gradient[1] = {'#'};
@@ -143,7 +146,7 @@ int main() {
                 double c_angle_step = c_fov / (double)w_width; // double when working with height (if char is 8x16) <-- assumed
 
                 // Get the horizontal angle of the ray
-                double h_angle = ((c_fov/-2.0f)+c_angle[1] + (c_angle_step) * x); // Angle is in degrees
+                double h_angle = ((c_fov/-2.0f)+(c_angle_step) * x); // Angle is in degrees
                 h_angle = (h_angle*M_PI)/180.0; // Converts angle to radians
 
                 // Initialize ray destination varaibles
@@ -153,18 +156,23 @@ int main() {
                 // Go through each row of the screen
                 for (int y=0; y<w_height; y++) {
                     // Get the vertical angle of the ray
-                    double v_angle = (c_angle_step*-1*(w_height/2)) + c_angle[0] + (c_angle_step * y);
+                    double v_angle = (c_angle_step*-1*(w_height/2)) + (c_angle_step * y);
                     v_angle *= 2; // x2 because text is twice as tall as wide
                     v_angle = (v_angle*M_PI)/180.0; // Converts angle to radians
 
                     // Calculate ray destination
                     dest[0]=c_rdist;dest[1]=0;dest[2]=0;          // Initialize dest
-                    v_ry(dest, v_angle, &dest_x, &dest_y, &dest_z);     // Rotate dest up/down
+                    dest[0]=dest[0];dest[1]=tan(h_angle);dest[2]=-tan(v_angle);
+                    v_ry(dest, (c_angle[0]*M_PI)/180.0, &dest_x, &dest_y, &dest_z);     // Rotate dest up/down
                     dest[0]=dest_x;dest[1]=dest_y;dest[2]=dest_z; // Set new dest
-                    v_rz(dest, h_angle, &dest_x, &dest_y, &dest_z); // Rotate dest left/right
+                    v_rz(dest, (c_angle[1]*M_PI)/180.0, &dest_x, &dest_y, &dest_z); // Rotate dest left/right
                     dest[0]=dest_x;dest[1]=dest_y;dest[2]=dest_z; // Set new dest
 
+
                     //dest[0]=0;dest[1]=-1;dest[2]=0;
+                    
+                    // Output to csv
+                    //file << dest[0] << "," << dest[1] << "," << dest[2] << "\n";
 
                     // Determine light ray direction (ray now plane behind camera)
                     double tx, ty, tz;
@@ -191,18 +199,29 @@ int main() {
                     else if (zbuf[x][y] == 0) {state=' ';mvaddch(y,x,state);}
                     //else {state='8';}
                     //sprintf(&state, "%d", (int)zbuf[x][y]);
-                   // mvaddch(y,x,state);
+                    // mvaddch(y,x,state);
+
+                    //char debug[256];
+                    //sprintf(debug, "Dx:%f, Dy:%f, Dz:%f", l_ray[0], l_ray[1], l_ray[2]);
+                    //mvprintw(0,0,debug);
 
                     // Debug
                     //temp = rot;
                     //char debug[256];
                     //sprintf(debug, "TMP:%f, Ox:%f, Oy:%f, Oz:%f, Lx:%f, Ly:%f, Lz:%f, Ah:%f, Av:%f",temp, c_pos[0], c_pos[1], c_pos[2], l_ray[0], l_ray[1], l_ray[2], c_angle[1], c_angle[0]);
-                    //mvprintw(0,0,debug);
+                    //mvprintw(1,0,debug);
 
                     // Delay
                     //usleep(1000000/10000);
                 }
             }
+            //file.close();
+            //return 0;
+            // Debug
+            /*char debug[256];
+            sprintf(debug, "Dx:%f, Dy:%f, Dz:%f", dest[0], dest[1], dest[2]);
+            mvprintw(0,0,debug);*/
+
             //char tri_n[16];
             //sprintf(tri_n, "%d", t);
             //mvprintw(0,0,tri_n);
