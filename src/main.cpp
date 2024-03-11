@@ -29,7 +29,7 @@ int main() {
     double zbuf[w_width][w_height];
 
     // Triangle
-    std::ifstream infile("./assets/cube.3dtty");
+    std::ifstream infile("./assets/LowPolyRat.3dtty");
     std::string line;
 
     int tris;
@@ -58,7 +58,7 @@ int main() {
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
     double c_fov = 90.0f; // degrees
-    double c_pos[3] = {-5.0, 0.0, 0.0}; //(x,y,z)
+    double c_pos[3] = {-50.0, 0.0, 25.0}; //(x,y,z)
     double c_rdist = 1.0f; // Render distance
 
     // Init gradient & lighting_delta (angle between camera and face normal
@@ -81,12 +81,12 @@ int main() {
         char c = ' ';
         c = getch();
         //usleep(1000);
-        if (c=='w') {c_pos[0]+=0.25;}
-        if (c=='s') {c_pos[0]-=0.25;}
-        if (c=='d') {c_pos[1]+=0.25;}
-        if (c=='a') {c_pos[1]-=0.25;}
-        if (c=='r') {c_pos[2]+=0.25;}
-        if (c=='f') {c_pos[2]-=0.25;}
+        if (c=='w') {c_pos[0]+=0.25*10;}
+        if (c=='s') {c_pos[0]-=0.25*10;}
+        if (c=='d') {c_pos[1]+=0.25*10;}
+        if (c=='a') {c_pos[1]-=0.25*10;}
+        if (c=='r') {c_pos[2]+=0.25*10;}
+        if (c=='f') {c_pos[2]-=0.25*10;}
 
         if (c=='k') {c_angle[0]+=2.5;}
         if (c=='i') {c_angle[0]-=2.5;}
@@ -164,6 +164,10 @@ int main() {
                     else if (zbuf[x][y] == 0) {state=' ';mvaddch(y,x,state);}
                 }
             }
+            char tri_n[16];
+            sprintf(tri_n, "%d", t);
+            mvprintw(0,0,tri_n);
+            //refresh();
         }
 
         // Display update
