@@ -29,7 +29,7 @@ int main() {
     double zbuf[w_width][w_height];
 
     // Triangle
-    std::ifstream infile("./assets/LowPolyRat.3dtty");
+    std::ifstream infile("./assets/lowpolyturtlele.3dtty");
     std::string line;
 
     int tris;
@@ -58,7 +58,7 @@ int main() {
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
     double c_fov = 90.0f; // degrees
-    double c_pos[3] = {-50.0, 0.0, 25.0}; //(x,y,z)
+    double c_pos[3] = {-125.0, 0.0, 10.0}; //(x,y,z)
     double c_rdist = 1.0f; // Render distance
 
     // Init gradient & lighting_delta (angle between camera and face normal
@@ -79,7 +79,8 @@ int main() {
 
         // Get input
         char c = ' ';
-        c = getch();
+        //c = getch();
+        rot+=0.1;
         //usleep(1000);
         if (c=='w') {c_pos[0]+=0.25*10;}
         if (c=='s') {c_pos[0]-=0.25*10;}
@@ -164,9 +165,14 @@ int main() {
                     else if (zbuf[x][y] == 0) {state=' ';mvaddch(y,x,state);}
                 }
             }
-            char tri_n[16];
-            sprintf(tri_n, "%d", t);
-            mvprintw(0,0,tri_n);
+            //char tri_n[16];
+            //sprintf(tri_n, "%d", t);
+            //mvprintw(0,0,tri_n);
+            char text[64];
+            sprintf(text, "%s", "If whatsapp was in my computer: ");
+            mvprintw(0,0,text);
+            sprintf(text, "%s", "(i NEED cpu)>");
+            mvprintw(2,25,text);
             //refresh();
         }
 
