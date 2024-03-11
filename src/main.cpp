@@ -4,6 +4,9 @@
 #include "./vector_math.hpp"
 #include <unistd.h>
 #include <cmath>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 double temp=0.0;
 double rot=0;
@@ -26,57 +29,30 @@ int main() {
     double zbuf[w_width][w_height];
 
     // Triangle
-    int tris = 12;
-    double triangle[12][4][3] = { // v0, v1, v2, normal
-   {{ 1.0,  0.0,  0.0},
-    { 0.0, -1.0,  0.0},
-    { 0.0,  0.0,  0.0},
-    { 0.0,  0.0, -1.0}},
-   {{ 0.0, -1.0,  0.0},
-    { 1.0,  0.0,  0.0},
-    { 1.0, -1.0,  0.0},
-    { 0.0,  0.0, -1.0}},
-   {{ 1.0, -1.0,  1.0},
-    { 0.0, -1.0,  0.0},
-    { 1.0, -1.0,  0.0},
-    { 0.0, -1.0,  0.0}},
-   {{ 0.0, -1.0,  0.0},
-    { 1.0, -1.0,  1.0},
-    { 0.0, -1.0,  1.0},
-    { 0.0, -1.0,  0.0}},
-   {{ 1.0,  0.0,  0.0},
-    { 1.0, -1.0,  1.0},
-    { 1.0, -1.0,  0.0},
-    { 1.0,  0.0,  0.0}},
-   {{ 1.0, -1.0,  1.0},
-    { 1.0,  0.0,  0.0},
-    { 1.0,  0.0,  1.0},
-    { 1.0,  0.0,  0.0}},
-   {{ 1.0, -1.0,  1.0},
-    { 0.0,  0.0,  1.0},
-    { 0.0, -1.0,  1.0},
-    { 0.0,  0.0,  1.0}},
-   {{ 0.0,  0.0,  1.0},
-    { 1.0, -1.0,  1.0},
-    { 1.0,  0.0,  1.0},
-    { 0.0,  0.0,  1.0}},
-   {{ 0.0,  0.0,  1.0},
-    { 0.0, -1.0,  0.0},
-    { 0.0, -1.0,  1.0},
-    {-1.0,  0.0,  0.0}},
-   {{ 0.0, -1.0,  0.0},
-    { 0.0,  0.0,  1.0},
-    { 0.0,  0.0,  0.0},
-    {-1.0,  0.0,  0.0}},
-   {{ 0.0,  0.0,  1.0},
-    { 1.0,  0.0,  0.0},
-    { 0.0,  0.0,  0.0},
-    { 0.0,  1.0,  0.0}},
-   {{ 1.0,  0.0,  0.0},
-    { 0.0,  0.0,  1.0},
-    { 1.0,  0.0,  1.0},
-    { 0.0,  1.0,  0.0}}};
+    std::ifstream infile("./assets/cube.3dtty");
+    std::string line;
 
+    int tris;
+    if (infile) {
+
+        getline(infile, line);
+        std::istringstream iss(line);
+        iss >> tris;
+        if (tris == 0) {return 2;}
+    }
+    double triangle[tris][4][3]; // v0, v1, v2, normal
+
+    float v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, v3_x, v3_y, v3_z, n_x, n_y, n_z;
+    for (int i=0; i<tris; i++) {
+        getline(infile, line);
+        std::istringstream iss(line);
+        iss >> v1_x >> v1_y >> v1_z >> v2_x >> v2_y >> v2_z >> v3_x >> v3_y >> v3_z >> n_x >> n_y >> n_z;
+        triangle[i][0][0] = v1_x; triangle[i][0][1] = v1_y; triangle[i][0][2] = v1_z;
+        triangle[i][1][0] = v2_x; triangle[i][1][1] = v2_y; triangle[i][1][2] = v2_z;
+        triangle[i][2][0] = v3_x; triangle[i][2][1] = v3_y; triangle[i][2][2] = v3_z;
+        triangle[i][3][0] =  n_x; triangle[i][3][1] =  n_y; triangle[i][3][2] =  n_z;
+    }
+    
     double new_tri[4][3];
 
     // Init variables
