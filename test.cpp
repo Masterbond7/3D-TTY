@@ -1,42 +1,28 @@
 #include <iostream>
-#include <cmath>
-
-// Function to rotate a 3D vector around the x-axis.
-void rotateX(double& x, double& y, double& z, double angle) {
-    double cosA = cos(angle);
-    double sinA = sin(angle);
-    double newY = cosA * y - sinA * z;
-    double newZ = sinA * y + cosA * z;
-    y = newY;
-    z = newZ;
-}
-
-// Function to rotate a 3D vector around the y-axis.
-void rotateY(double& x, double& y, double& z, double angle) {
-    double cosA = cos(angle);
-    double sinA = sin(angle);
-    double newX = cosA * x + sinA * z;
-    double newZ = -sinA * x + cosA * z;
-    x = newX;
-    z = newZ;
-}
+#include <fstream>
+#include <string>
+#include <sstream>
 
 int main() {
-    // Initial camera direction along the z-axis.
-    double rayDirectionX = 0.0;
-    double rayDirectionY = 1.0;
-    double rayDirectionZ = 0.0;
+    std::ifstream infile("./test.txt");
 
-    // Vertical and horizontal rotation angles (in radians).
-    double verticalAngle = M_PI_4; // Adjust this angle for vertical rotation.
-    double horizontalAngle = M_PI_4; // Adjust this angle for horizontal rotation.
+    if (infile) {
+        std::string line;
 
-    // Rotate the camera direction.
-    rotateX(rayDirectionX, rayDirectionY, rayDirectionZ, verticalAngle);
-    rotateY(rayDirectionX, rayDirectionY, rayDirectionZ, horizontalAngle);
+        int num_lines;
+        getline(infile, line);
+        std::istringstream iss(line);
+        iss >> num_lines;
+        std::cout << "Num lines" << num_lines << std::endl;
 
-    // The resulting ray direction vector is (rayDirectionX, rayDirectionY, rayDirectionZ).
-    std::cout << "Ray Direction: (" << rayDirectionX << ", " << rayDirectionY << ", " << rayDirectionZ << ")\n";
+        float v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, v3_x, v3_y, v3_z, n_x, n_y, n_z;
+        for (int i=0; i<num_lines; i++) {
+            getline(infile, line);
+            std::istringstream iss(line);
+            iss >> v1_x >> v1_y >> v1_z >> v2_x >> v2_y >> v2_z >> v3_x >> v3_y >> v3_z >> n_x >> n_y >> n_z;
+            std::cout << v1_x << v1_y << v1_z << v2_x << v2_y << v2_z << v3_x << v3_y << v3_z << n_x << n_y << n_z << std::endl;
+        }
+    }
 
     return 0;
 }
