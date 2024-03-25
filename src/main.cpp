@@ -168,15 +168,24 @@ int main() {
             //char tri_n[16];
             //sprintf(tri_n, "%d", t);
             //mvprintw(0,0,tri_n);
-            char text[64];
-            sprintf(text, "%s", "If whatsapp was in my computer: ");
-            mvprintw(0,0,text);
-            sprintf(text, "%s", "(i NEED cpu)>");
-            mvprintw(2,25,text);
             //refresh();
         }
 
         // Display update
+        char text[64];
+        sprintf(text, "%s", "If whatsapp was in my computer: ");
+        mvprintw(0,0,text);
+        sprintf(text, "%s", "factorio <(vibin')");
+        mvprintw(1,19,text);
+        sprintf(text, "%s", "(i NEED cpu)>");
+        mvprintw(2,25,text);
+        sprintf(text, "%s", "steam <(vibin')");
+        mvprintw(3,22,text);
+        sprintf(text, "%s", "terminal <(vibin')");
+        mvprintw(4,19,text);
+        sprintf(text, "%s", "firefox <(vibin')");
+        mvprintw(5,20,text);
+        //move(2,25); std::cout << "(i \e[5mNEED\e[25m cpu]])>";
         refresh();
 
         // Delay
