@@ -1,0 +1,39 @@
+t_start : start time (gets moved around)
+//t_zbuff : time to reset z_buffer
+//t_input : time to take and process inputs
+//t_calcA : time to calc angles and step sizes
+t_calcR : time to calc ray destination
+//t_calcP : time to rotate plane
+t_calcL : time to calculate light ray direction
+//t_calcC : time to calculate colour of lighting
+t_calcI : time to check for intersection with triangle
+t_calcT : time to calculate per triangle
+t_drawC : time to draw charachter
+t_displ : time to refresh display
+
+
+t_scalc :1
+t_strig :2
+t_calcR :1
+t_calcI :1
+t_drawC :1
+t_calcT :2
+t_sdraw :3
+t_displ :3
+
+time code:
+gettimeofday(&tv, NULL);
+t_start = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+
+sprintf(text, "Frame time: %.3fms", (t_sdraw-t_displ)/1000.0);
+        mvprintw(0,0,text);
+        sprintf(text, "Time/tri: %.3fms", (t_calcT-t_strig)/1000.0);
+        mvprintw(1,0,text);
+        sprintf(text, "Ray calcs: %.3fms", (t_calcR-t_scalc)/1000.0);
+        mvprintw(2,0,text);
+        sprintf(text, "Intersect: %.3fms", (t_calcI-t_calcR)/1000.0);
+        mvprintw(3,0,text);
+        sprintf(text, "Draw char: %.3fms", (t_drawC-t_calcI)/1000.0);
+        mvprintw(4,0,text);
+        sprintf(text, "Draw time: %.3fms", draw_time);
+        mvprintw(5,0,text);
