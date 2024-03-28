@@ -7,7 +7,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <sys/time.h>
+#include <ctime>
 
 double temp=0.0;
 double rot=0;
@@ -34,13 +34,12 @@ int main() {
     std::string line;
 
     // Time stuff
-    struct timeval tv;
-    uint64_t t_scalc, t_zbuff, t_input,
+    std::clock_t t_scalc, t_zbuff, t_input,
              t_calcA, t_calcR, t_calcP,
              t_calcL, t_calcC, t_calcI,
-             t_calcT, t_drawC, t_displ, t_strig, t_start, t_sdraw, draw_time, t_end, 
-             tri_time, ray_time, int_time, chr_time, ems_time;
-    draw_time = 0;
+             t_calcT, t_drawC, t_displ, t_strig, t_start, t_sdraw, t_end, a,b;
+    uint64_t tri_time, ray_time, int_time, chr_time, ems_time;
+    double draw_time = 0;
 
     int tris;
     if (infile) {
@@ -79,7 +78,8 @@ int main() {
     int shades = 19;
 
     // Graphics loop
-    while (true) {
+    for (int i=0; i<1; i++) {
+    //while (true) {
         // Reset z_buffer
         for (int i=0; i<w_width; i++) {
             for (int j=0; j<w_height; j++) {
@@ -113,10 +113,8 @@ int main() {
         chr_time=0;
         ems_time=0;
         for (int t=0; t<tris; t++) {
-            gettimeofday(&tv, NULL);
-            t_strig = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-            gettimeofday(&tv, NULL);
-            t_start = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+            //t_strig = std::clock();
+            ////t_start = std::clock();
             // Rotate triangle v_rz
             double tx, ty, tz;
             v_rz(triangle[t][0], rot, &tx, &ty, &tz); new_tri[0][0]=tx; new_tri[0][1]=ty; new_tri[0][2]=tz;
@@ -128,14 +126,12 @@ int main() {
             if (c_angle[1] >  180) {c_angle[1] =-360 + c_angle[1];}
             if (c_angle[0] <  -90) {c_angle[0] = -90;}
             if (c_angle[0] >   90) {c_angle[0] =  90;}
-            gettimeofday(&tv, NULL);
-            t_end = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-            ems_time += t_end - t_start;
+            //t_end = std::clock();
+            //ems_time += t_end - t_start;
 
             // Go through each column of the screen
             for (int x=0; x<w_width; x++) {
-                gettimeofday(&tv, NULL);
-                t_start = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+                //t_start = std::clock();
                 // Get the camera angle step size
                 double c_angle_step = c_fov / (double)w_width; // double when working with height (if char is 8x16) <-- assumed
 
@@ -146,23 +142,19 @@ int main() {
                 // Initialize ray destination variables
                 double dest[3];
                 double dest_x, dest_y, dest_z;
-                gettimeofday(&tv, NULL);
-                t_end = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-                ems_time += t_end - t_start;
+                //t_end = std::clock();
+                //ems_time += t_end - t_start;
                 // Go through each row of the screen
                 for (int y=0; y<w_height; y++) {
-                    gettimeofday(&tv, NULL);
-                    t_start = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+                    //t_start = std::clock();
                     // Get the vertical angle of the ray
                     double v_angle = (c_angle_step*-1*(w_height/2)) + (c_angle_step * y);
                     v_angle *= 2; // x2 because text is twice as tall as wide
                     v_angle = (v_angle*M_PI)/180.0; // Converts angle to radians
                     
-                    gettimeofday(&tv, NULL);
-                    t_end = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-                    ems_time += t_end - t_start;
-                    gettimeofday(&tv, NULL);
-                    t_scalc = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+                    //t_end = std::clock();
+                    //ems_time += t_end - t_start;
+                    // t_scalc = std::clock();
                     // Calculate ray destination
                     dest[0]=c_rdist;dest[1]=0;dest[2]=0;          // Initialize dest
                     dest[0]=dest[0];dest[1]=c_rdist*tan(h_angle);dest[2]=-c_rdist*tan(v_angle); // Plot ray points on plane
@@ -191,20 +183,17 @@ int main() {
                     if (lighting_dangle < 0) {lighting_dangle *= -1;}
                     shade = shades - (int)round(lighting_dangle*shades);
                     if (shade > shades-1) {shade = shades-1;}
-                    gettimeofday(&tv, NULL);
-                    t_calcR = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+                    // t_calcR = std::clock();
                     ray_time += t_calcR - t_scalc;
 
                     // Check for intersection with triangle
                     double is_intersection = intersects_triangle(c_pos, dest, new_tri[0], new_tri[1], new_tri[2]);
-                    gettimeofday(&tv, NULL);
-                    t_calcI = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-                    int_time += t_calcI - t_calcR;
+                    // t_calcI = std::clock();
+                    int_time = t_calcI - t_calcR;
                     if ((is_intersection != 0) && (zbuf[x][y] == 0 || is_intersection < zbuf[x][y])) {state=gradient[shade]; zbuf[x][y]=is_intersection;mvaddch(y,x,state);}//state=gradient[shade]; zbuf[x][y]=is_intersection;}
                     else if (zbuf[x][y] == 0) {state=' ';mvaddch(y,x,state);}
-                    gettimeofday(&tv, NULL);
-                    t_drawC = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-                    chr_time = t_drawC - t_calcR;
+                    // t_drawC = std::clock();
+                    chr_time += t_drawC - t_calcR;
                 }
             }
             //char tri_n[16];
@@ -212,12 +201,12 @@ int main() {
             //mvprintw(0,0,tri_n);
             //refresh();
             /*gettimeofday(&tv, NULL);
-            t_calcT = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-            tri_time += t_calcT-t_strig;*/
+            t_calcT = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);*/
+            // t_calcT = std::clock();
+            // tri_time += t_calcT-t_strig;
         }
-        gettimeofday(&tv, NULL);
-            t_calcT = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-            tri_time += t_calcT-t_strig;
+        //t_calcT = std::clock();
+        //tri_time += t_calcT-t_strig;
 
         // Display update
         /*char text[64];
@@ -234,30 +223,30 @@ int main() {
         sprintf(text, "%s", "firefox <(vibin')");
         mvprintw(5,20,text);*/
         //move(2,25); std::cout << "(i \e[5mNEED\e[25m cpu]])>";
-        gettimeofday(&tv, NULL);
-        t_sdraw = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
+        // t_sdraw = std::clock();
         
         char text[64];
-        sprintf(text, "Frame time: %.3fms", ((t_sdraw-t_displ))/1000.0);
+        sprintf(text, "Frame time: %.3fms", ((double)(t_sdraw-t_displ))*(1000.0/CLOCKS_PER_SEC));
         mvprintw(0,0,text);
-        sprintf(text, "Time/tri: %fms", (tri_time)/1000.0);
+        sprintf(text, "Time/tri: %fms", (double)(tri_time)*(1000.0/CLOCKS_PER_SEC));
         mvprintw(1,0,text);
-        sprintf(text, "Ray calcs: %fms", (ray_time)/1000.0);
+        sprintf(text, "Ray calcs: %fms", (double)(ray_time)*(1000.0/CLOCKS_PER_SEC));
         mvprintw(2,0,text);
-        sprintf(text, "Intersect: %fms", (int_time)/1000.0);
+        sprintf(text, "Intersect: %fms", (double)(int_time));//*(1000.0/CLOCKS_PER_SEC));
         mvprintw(3,0,text);
-        sprintf(text, "Draw char: %fms", (chr_time)/1000.0);
+        sprintf(text, "Draw char: %fms", (double)(chr_time)*(1000.0/CLOCKS_PER_SEC));
         mvprintw(4,0,text);
-        sprintf(text, "Draw time: %fms", draw_time);
+        sprintf(text, "Draw time: %fms", (double)draw_time*(1000.0/CLOCKS_PER_SEC));
         mvprintw(5,0,text);
-        sprintf(text, "End - Start: %fms", (ems_time/(tris))/1000.0);
+        sprintf(text, "End - Start: %fms", ((double)ems_time/(tris))*(1000.0/CLOCKS_PER_SEC));
         mvprintw(6,0,text);
+        sprintf(text, "per clock: %fms", ((double)(b-a))*((double)(tris*w_width*w_height))*(1000.0/CLOCKS_PER_SEC));
+        mvprintw(7,0,text);
         
         refresh();
         
-        gettimeofday(&tv, NULL);
-        t_displ = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
-        draw_time = (t_displ-t_sdraw)/1000.0;
+        // t_displ = std::clock();
+        draw_time = ((double)(t_displ-t_sdraw))/1000.0;
         //refresh();
 
         // Delay

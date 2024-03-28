@@ -26,14 +26,19 @@ gettimeofday(&tv, NULL);
 t_start = (uint64_t)(tv.tv_sec)*1000000 + (uint64_t)(tv.tv_usec);
 
 sprintf(text, "Frame time: %.3fms", (t_sdraw-t_displ)/1000.0);
-        mvprintw(0,0,text);
-        sprintf(text, "Time/tri: %.3fms", (t_calcT-t_strig)/1000.0);
-        mvprintw(1,0,text);
-        sprintf(text, "Ray calcs: %.3fms", (t_calcR-t_scalc)/1000.0);
-        mvprintw(2,0,text);
-        sprintf(text, "Intersect: %.3fms", (t_calcI-t_calcR)/1000.0);
-        mvprintw(3,0,text);
-        sprintf(text, "Draw char: %.3fms", (t_drawC-t_calcI)/1000.0);
-        mvprintw(4,0,text);
-        sprintf(text, "Draw time: %.3fms", draw_time);
-        mvprintw(5,0,text);
+mvprintw(0,0,text);
+sprintf(text, "Time/tri: %.3fms", (t_calcT-t_strig)/1000.0);
+mvprintw(1,0,text);
+sprintf(text, "Ray calcs: %.3fms", (t_calcR-t_scalc)/1000.0);
+mvprintw(2,0,text);
+sprintf(text, "Intersect: %.3fms", (t_calcI-t_calcR)/1000.0);
+mvprintw(3,0,text);
+sprintf(text, "Draw char: %.3fms", (t_drawC-t_calcI)/1000.0);
+mvprintw(4,0,text);
+sprintf(text, "Draw time: %.3fms", draw_time);
+mvprintw(5,0,text);
+
+tri_time
+ray_time
+int_time
+chr_time
