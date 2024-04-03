@@ -1,2 +1,2 @@
 echo "Compiling..."
-g++ ./src/main.cpp -Wall -lncursesw -O2 -o ./bin/app.o
+g++ ./src/main.cpp -Wall -lncursesw -Ofast -o ./bin/app.o

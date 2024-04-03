@@ -1,11 +1,11 @@
-#include <iostream>
+//#include <iostream>
 #include <ncurses.h>
 #include "./moller_trumbore.hpp"
 #include "./vector_math.hpp"
 #include <unistd.h>
 #include <cmath>
 #include <fstream>
-#include <string>
+//#include <string>
 #include <sstream>
 //#include "./fast_math.hpp"
 
@@ -30,7 +30,7 @@ int main() {
     double zbuf[w_width][w_height];
 
     // Triangle
-    std::ifstream infile("./assets/utahteapot.3dtty");
+    std::ifstream infile("./assets/lowpolyturtlele.3dtty");
     std::string line;
 
     int tris;
@@ -55,9 +55,9 @@ int main() {
     }
 
     // Init variables
-    double c_angle[2] = {15.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
+    double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
     double c_fov = 90.0f; // degrees
-    double c_pos[3] = {-20.0, 0.0, 10.0}; //(x,y,z)
+    double c_pos[3] = {-75.0, 0.0, 10.0}; //(x,y,z)
     double c_rdist = 1.0f; // Render distance
 
     // Init gradient & lighting_delta (angle between camera and face normal
@@ -93,6 +93,11 @@ int main() {
         if (c=='i') {c_angle[0]-=2.5;}
         if (c=='l') {c_angle[1]+=10.0;}
         if (c=='j') {c_angle[1]-=10.0;}
+
+        // Rotate the camera
+        /*double cx, cy, cz;
+        v_rz(c_pos, rot, &cx, &cy, &cz); c_pos[0]=cx; c_pos[1]=cy; c_pos[2]=cz;
+        c_angle[1] += rot*180.0/M_PI;*/
 
         if (c_angle[1] < -180) {c_angle[1] = 360 + c_angle[1];}
         if (c_angle[1] >  180) {c_angle[1] =-360 + c_angle[1];}
@@ -142,17 +147,17 @@ int main() {
                 dest[0]=dest[0];dest[1]=c_rdist*q_tan(h_angle);dest[2]=-c_rdist*q_tan(v_angle); // Plot ray points on plane
 
                 // Rotate plane
-                v_ry(dest, (c_angle[0]*M_PI)/180.0, &dest_x, &dest_y, &dest_z);     // Rotate dest up/down
+                q_v_ry(dest, (c_angle[0]*M_PI)/180.0, &dest_x, &dest_y, &dest_z);     // Rotate dest up/down
                 dest[0]=dest_x;dest[1]=dest_y;dest[2]=dest_z; // Set new dest
-                v_rz(dest, (c_angle[1]*M_PI)/180.0, &dest_x, &dest_y, &dest_z); // Rotate dest left/right
+                q_v_rz(dest, (c_angle[1]*M_PI)/180.0, &dest_x, &dest_y, &dest_z); // Rotate dest left/right
                 dest[0]=dest_x;dest[1]=dest_y;dest[2]=dest_z; // Set new dest
 
                 // Determine light ray direction (ray now plane behind camera)
                 double tx, ty, tz;
                 l_ray[0] = c_rdist; l_ray[1]=0.0; l_ray[2]=0.0;
-                v_ry(l_ray, (c_angle[0]*M_PI)/180.0, &tx, &ty, &tz);
+                q_v_ry(l_ray, (c_angle[0]*M_PI)/180.0, &tx, &ty, &tz);
                 l_ray[0]=tx;l_ray[1]=ty;l_ray[2]=tz;
-                v_rz(l_ray, (c_angle[1]*M_PI)/180.0, &tx, &ty, &tz);
+                q_v_rz(l_ray, (c_angle[1]*M_PI)/180.0, &tx, &ty, &tz);
                 l_ray[0]=tx;l_ray[1]=ty;l_ray[2]=tz;
 
                 for (int t=0; t<tris; t++) {
