@@ -30,7 +30,7 @@ int main() {
     double zbuf[w_width][w_height];
 
     // Triangle
-    std::ifstream infile("./assets/lowpolyturtlele.3dtty");
+    std::ifstream infile("./assets/utahteapot.3dtty");
     std::string line;
 
     int tris;
@@ -59,7 +59,7 @@ int main() {
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
     double c_fov = 90.0f; // degrees
-    double c_pos[3] = {-125.0, 0.0, 10.0}; //(x,y,z)
+    double c_pos[3] = {-15.0, 0.0, 5.0}; //(x,y,z)
     double c_rdist = 1.0f; // Render distance
 
     // Init gradient & lighting_delta (angle between camera and face normal
@@ -70,12 +70,12 @@ int main() {
     int shades = 19;
 
     // Graphics loop
-    //for (int i=0; i<100; i++) {
+    //for (int i=0; i<1; i++) {
     while (true) {
         // Reset z_buffer
         for (int i=0; i<w_width; i++) {
             for (int j=0; j<w_height; j++) {
-                zbuf[i][j] = 0;
+                zbuf[i][j] = -1;
             }
         }
 
@@ -166,14 +166,10 @@ int main() {
 
                     // Check for intersection with triangle
                     double is_intersection = intersects_triangle(c_pos, dest, new_tri[0], new_tri[1], new_tri[2]);
-                    if ((is_intersection != 0) && (zbuf[x][y] == 0 || is_intersection < zbuf[x][y])) {state=gradient[shade]; zbuf[x][y]=is_intersection;mvaddch(y,x,state);}//state=gradient[shade]; zbuf[x][y]=is_intersection;}
-                    else if (zbuf[x][y] == 0) {state=' ';mvaddch(y,x,state);}
+                    if ((is_intersection != 0) && (zbuf[x][y] == 0 || is_intersection > zbuf[x][y])) {state=gradient[shade]; zbuf[x][y]=is_intersection;mvaddch(y,x,state);}//state=gradient[shade]; zbuf[x][y]=is_intersection;}
+                    else if (zbuf[x][y] < 0) {state=' ';mvaddch(y,x,state);zbuf[x][y]=0;}
                 }
             }
-            //char tri_n[16];
-            //sprintf(tri_n, "%d", t);
-            //mvprintw(0,0,tri_n);
-            //refresh();
         }
 
         // Display update

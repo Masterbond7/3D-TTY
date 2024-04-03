@@ -1,16 +1,14 @@
 #include "./fast_math.hpp"
 
 int v_ry(double vin[3], double angle, double *x, double *y, double *z) {
-    // Get the rotation matrix
-    double m[3][3] = {
-           {q_cos(angle),  0, q_sin(angle)},
-           {0,           1, 0         },
-           {-q_sin(angle), 0, q_cos(angle)}};
+    float cos, sin;
+    cos = q_cos(angle);
+    sin = q_sin(angle);
 
     // Multiply by the rotation matrix
-    *x = vin[0]*m[0][0] + vin[1]*m[0][1] + vin[2]*m[0][2];
-    *y = vin[0]*m[1][0] + vin[1]*m[1][1] + vin[2]*m[1][2];
-    *z = vin[0]*m[2][0] + vin[1]*m[2][1] + vin[2]*m[2][2];
+    *x =  vin[0]*cos + vin[2]*sin;
+    *y =  vin[1];
+    *z = -vin[0]*sin + vin[2]*cos;
 
     // Return 0
     return 0;
