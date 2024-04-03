@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+//#include "./fast_math.hpp"
 
 double temp=0.0;
 double rot=0;
@@ -69,8 +70,8 @@ int main() {
     int shades = 19;
 
     // Graphics loop
-    for (int i=0; i<1; i++) {
-    //while (true) {
+    //for (int i=0; i<100; i++) {
+    while (true) {
         // Reset z_buffer
         for (int i=0; i<w_width; i++) {
             for (int j=0; j<w_height; j++) {
@@ -95,8 +96,11 @@ int main() {
         if (c=='l') {c_angle[1]+=10.0;}
         if (c=='j') {c_angle[1]-=10.0;}
 
-        if (c=='q') {rot-=0.1;}
-        if (c=='e') {rot+=0.1;}
+        if (c=='q') {rot-=M_PI/4;}//0.1;}
+        if (c=='e') {rot+=M_PI/4;}//0.1;}
+
+        if (rot > M_PI) {rot = -M_PI;}
+        if (rot < -M_PI) {rot = M_PI;}
 
         for (int t=0; t<tris; t++) {
             // Rotate triangle v_rz
@@ -133,7 +137,7 @@ int main() {
                     
                     // Calculate ray destination
                     dest[0]=c_rdist;dest[1]=0;dest[2]=0;          // Initialize dest
-                    dest[0]=dest[0];dest[1]=c_rdist*tan(h_angle);dest[2]=-c_rdist*tan(v_angle); // Plot ray points on plane
+                    dest[0]=dest[0];dest[1]=c_rdist*q_tan(h_angle);dest[2]=-c_rdist*q_tan(v_angle); // Plot ray points on plane
 
                     // Rotate plane
                     v_ry(dest, (c_angle[0]*M_PI)/180.0, &dest_x, &dest_y, &dest_z);     // Rotate dest up/down
