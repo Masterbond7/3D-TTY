@@ -71,8 +71,8 @@ int main() {
     double c_angle_step = c_fov / (double)w_width; // double when working with height (if char is 8x16) <-- assumed
 
     // Graphics loop
-    for (int i=0; i<10; i++) {
-    //while (true) {
+    //for (int i=0; i<10; i++) {
+    while (true) {
         // Reset z_buffer
         for (int i=0; i<w_width; i++) {
             for (int j=0; j<w_height; j++) {

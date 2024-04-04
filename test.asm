@@ -2,7 +2,7 @@ section .text
 	global _start
 
 section .data
-msg db 'Hello, world!',0xa
+msg db 'Hello, world!',0x7
 len equ $ - msg
 
 section .text
