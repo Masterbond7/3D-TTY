@@ -57,7 +57,7 @@ int main() {
     // Init variables
     double c_angle[2] = {0.0, 0.0}; // (deg) Angle of rotation from x+, (vert, hor)
     double c_fov = 90.0f; // degrees
-    double c_pos[3] = {-75.0, 0.0, 10.0}; //(x,y,z)
+    double c_pos[3] = {-75.0, 0.0, 5.0}; //(x,y,z)
     double c_rdist = 1.0f; // Render distance
 
     // Init gradient & lighting_delta (angle between camera and face normal
@@ -67,9 +67,12 @@ int main() {
     const char gradient[] = {'#', 'M', 'W', 'N', 'X', 'K', '0', 'O', 'k', 'd', 'x', 'o', 'l', 'c', ';', ':', ',', '\'', '.'};
     int shades = 19;
 
+    // Get the camera angle step size
+    double c_angle_step = c_fov / (double)w_width; // double when working with height (if char is 8x16) <-- assumed
+
     // Graphics loop
-    //for (int i=0; i<1; i++) {
-    while (true) {
+    for (int i=0; i<10; i++) {
+    //while (true) {
         // Reset z_buffer
         for (int i=0; i<w_width; i++) {
             for (int j=0; j<w_height; j++) {
@@ -124,9 +127,6 @@ int main() {
 
         // Go through each column of the screen
         for (int x=0; x<w_width; x++) {
-            // Get the camera angle step size
-            double c_angle_step = c_fov / (double)w_width; // double when working with height (if char is 8x16) <-- assumed
-
             // Get the horizontal angle of the ray
             double h_angle = ((c_fov/-2.0f)+(c_angle_step) * x); // Angle is in degrees
             h_angle = (h_angle*M_PI)/180.0; // Converts angle to radians
@@ -174,7 +174,7 @@ int main() {
 
                     // Check for intersection with triangle
                     double is_intersection = intersects_triangle(c_pos, dest, triangle[t][0], triangle[t][1], triangle[t][2]);
-                    if ((is_intersection != 0) && (zbuf[x][y] == 0 || is_intersection > zbuf[x][y])) {state=gradient[shade]; zbuf[x][y]=is_intersection;mvaddch(y,x,state);}//state=gradient[shade]; zbuf[x][y]=is_intersection;}
+                    if ((is_intersection != 0) && (zbuf[x][y] == 0 || is_intersection < zbuf[x][y])) {state=gradient[shade]; zbuf[x][y]=is_intersection;mvaddch(y,x,state);}//state=gradient[shade]; zbuf[x][y]=is_intersection;}
                     else if (zbuf[x][y] < 0) {state=' ';mvaddch(y,x,state);zbuf[x][y]=0;}
                 }
             }
@@ -184,7 +184,7 @@ int main() {
         refresh();
 
         // Delay
-        //usleep(1000000/30); // 30fps
+        //usleep(1000000/3); // 3fps
     }
 
     // End program
